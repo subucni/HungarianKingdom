@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nagy Magyarország – Magyar Királyság történelmi határai</title>
+    <meta name="description" content="Nagy Magyarország és a Magyar Királyság történelmi határai interaktív térképen. Trianon előtti Magyarország, Felvidék, Erdély, Vajdaság, Kárpátalja.">
+    <meta name="keywords" content="Nagy Magyarország, Magyar Királyság, történelmi határok, Trianon, Felvidék, Erdély, Vajdaság, Kárpátalja, interaktív térkép">
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: #f0f0f0;
+            color: #333;
+            height: 100vh;
+            overflow: hidden;
+        }
+        .layout {
+            display: flex;
+            height: 100vh;
+        }
+        .sidebar {
+            min-width: 280px;
+            max-width: 400px;
+            width: 320px;
+            background: #1a1a2e;
+            color: white;
+            padding: 1.5rem;
+            overflow-y: auto;
+            flex-shrink: 0;
+        }
+        .sidebar h1 {
+            margin: 0 0 0.5rem 0;
+            font-size: 1.5rem;
+            line-height: 1.2;
+        }
+        .sidebar .subtitle {
+            margin: 0 0 1.5rem 0;
+            opacity: 0.7;
+            font-size: 0.9rem;
+        }
+        .sidebar .info {
+            font-size: 0.9rem;
+            line-height: 1.6;
+            opacity: 0.9;
+        }
+        .sidebar .info p {
+            margin: 0 0 1rem 0;
+        }
+        .sidebar .disclaimer {
+            font-size: 0.8rem;
+            opacity: 0.6;
+            font-style: italic;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            padding-top: 1rem;
+            margin-top: 1rem;
+        }
+        .sidebar a {
+            color: #7eb8ff;
+        }
+        .map-area {
+            flex: 1;
+            min-width: 400px;
+            min-height: 400px;
+            position: relative;
+        }
+        .map-area iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+        @media (max-width: 700px) {
+            .layout {
+                flex-direction: column;
+            }
+            .sidebar {
+                width: 100%;
+                max-width: none;
+                max-height: 40vh;
+            }
+            .map-area {
+                min-height: 60vh;
+                flex: 1;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="layout">
+        <aside class="sidebar">
+            <h1>Nagy Magyarország</h1>
+            <p class="subtitle">A Magyar Királyság történelmi határai</p>
+            
+            <div class="info">
+                <p>
+                    Ez az interaktív térkép a <strong>Magyar Királyság</strong> (Nagy Magyarország) 
+                    történelmi határait mutatja be a trianoni békeszerződés előtti állapot szerint.
+                </p>
+                <p>
+                    A térképen látható területek: a mai Magyarország, <strong>Felvidék</strong> (Szlovákia), 
+                    <strong>Kárpátalja</strong>, <strong>Erdély</strong>, a <strong>Vajdaság</strong>, 
+                    valamint a történelmi horvát és ausztriai részek.
+                </p>
+                <p>
+                    <a href="https://umap.openstreetmap.fr/hu/map/nagy-magyarorszag_1480493" target="_blank">
+                        Teljes képernyős nézet
+                    </a>
+                </p>
+                <p class="disclaimer">
+                    A térkép tájékoztató jellegű, nem minősül hivatalos vagy hiteles forrásnak. 
+                    A határvonalak közelítő ábrázolások, és eltérhetnek a történelmi dokumentumoktól.
+                </p>
+            </div>
+        </aside>
+
+        <main class="map-area">
+            <iframe 
+                src="https://umap.openstreetmap.fr/hu/map/nagy-magyarorszag_1480493?scaleControl=false&miniMap=false&scrollWheelZoom=true&zoomControl=true&editMode=disabled&moreControl=true&datalayersControl=true&onLoadPanel=none&captionBar=false"
+                allowfullscreen>
+            </iframe>
+        </main>
+    </div>
+</body>
+</html>
