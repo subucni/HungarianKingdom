@@ -13,6 +13,8 @@ A vármegyehatárok 1910. december 31-i, a népszámlálás napján érvényes k
 | `data/magyarorszag-es-fiume-1910-terulet.geojson` | Ugyanez felületként (MultiPolygon). |
 | `data/magyarorszag-mai-hatar-vonal.geojson` | A mai Magyarország határa vonalként (LineString). |
 | `data/magyarorszag-mai-hatar-terulet.geojson` | Ugyanez felületként (Polygon); ezt rajzolja a térkép. |
+| `data/varmegyek-ma.geojson` | A mai 19 vármegye és Budapest (20 felület). |
+| `data/varmegyek-ma-vonal.geojson` | Ugyanezek külső vonala, vármegyénként. |
 | `data/varmegyek-magyarorszag-1910.geojson` | A szűkebb Magyarország 63 vármegyéje és Fiume város és területe (64 elem). |
 | `data/varmegyek-horvat-szlavon-1910.geojson` | Horvát-Szlavónország 8 vármegyéje. |
 
@@ -48,6 +50,14 @@ A két rész Magyarország és a tőle Horvát-Szlavónország által elválaszt
 Forrás: OpenStreetMap Magyarország-viszony (`relation/21335`, adminisztratív országhatár), letöltve 2026. november 21-én a Nominatim polygon-végpontjáról. Licenc: [ODbL 1.0](https://opendatacommons.org/licenses/odbl/1-0/), © OpenStreetMap közreműködők. A nyers vonal 37 754 pont volt; Douglas–Peucker egyszerűsítés 0,002 fokos tűréssel 1689 pontra csökkentette. A felület területe az egyszerűsítés után 93 011 km², a részletes poligoné 93 012 km².
 
 A fájlban a név: `Magyarország (mai határ)`. A térkép kék vonallal (`#1d4ed8`) rajzolja, a piros királysághatár és a vármegyefelületek fölött.
+
+## Mai vármegyék
+
+Forrás: OpenStreetMap, a hét statisztikai régió (`admin_level=5`) alatti 20 `admin_level=6` viszony: 19 vármegye és Budapest. Letöltve 2026. november 21-én. Licenc: [ODbL 1.0](https://opendatacommons.org/licenses/odbl/1-0/), © OpenStreetMap közreműködők.
+
+A közös megyehatárokat egyszer, 0,002 fokos tűréssel egyszerűsítettük, hogy a szomszédok éle azonos maradjon. A külső peremet a már egyszerűsített mai országhatárra illesztettük: a vármegyék uniója és a `magyarorszag-mai-hatar` felület eltérése 0,001 km² alatt van. Az OSM névcímkéje még „megye”; a fájlban a 2023 óta hivatalos „vármegye” alak szerepel, Budapest külön főváros. A székhely az OSM `admin_centre` csomópontja. Pest vármegye székhelye Budapest, a székhely pontja ezért a főváros felületén van, nem a megyéében.
+
+A térkép lila vonallal (`#6d28d9`) rajzolja, halvány lilás kitöltéssel, hogy a határ összevethető legyen az 1910-es vármegyékkel. Tulajdonságok: `name`, `szekhely`, valamint `tipus` (`vármegye` vagy `főváros`) és `cimke`. A vonalas fájlban csak `name` és `szekhely` van.
 
 ## Vármegyehatárok
 
