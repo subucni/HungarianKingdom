@@ -6,7 +6,11 @@ A vármegyehatárok 1910. december 31-i, a népszámlálás napján érvényes k
 
 | Fájl | Tartalom |
 | --- | --- |
-| `data/magyar-kiralysag-hatar.geojson` | A korábbi térkép egyszerűsített Magyar Királyság-körvonala, 1 poligon. |
+| `data/magyar-kiralysag-hatar.geojson` | A térképen rajzolt királysághatár: a vármegyék uniójának külső pereme, Horvát-Szlavónországgal együtt. |
+| `data/nagy-magyarorszag-1910-vonal.geojson` | Ugyanez a határ vonalként (LineString), a korábbi uMap-körvonal formátumában. |
+| `data/nagy-magyarorszag-1910-terulet.geojson` | Ugyanez a határ felületként (Polygon), a korábbi uMap-felület formátumában. |
+| `data/magyarorszag-es-fiume-1910-vonal.geojson` | Csak a szűkebb Magyarország és Fiume külső pereme (MultiLineString: az ország és a fiumei exclávé). |
+| `data/magyarorszag-es-fiume-1910-terulet.geojson` | Ugyanez felületként (MultiPolygon). |
 | `data/varmegyek-magyarorszag-1910.geojson` | A szűkebb Magyarország 63 vármegyéje és Fiume város és területe (64 elem). |
 | `data/varmegyek-horvat-szlavon-1910.geojson` | Horvát-Szlavónország 8 vármegyéje. |
 
@@ -19,11 +23,23 @@ Egy vármegye tulajdonságai:
 - `orszagcsoport` – `magyarorszag` vagy `horvat-szlavonorszag`
 - `cimke` – a felirat helye `[hosszúság, szélesség]`, a poligon belsejében
 
-## A királyság egyszerűsített határa
+## A királyság határa
 
-A `data/magyar-kiralysag-hatar.geojson` a korábban beágyazott uMap-térkép (`nagy-magyarorszag`, azonosító 1480493, réteg `NagyMagyarOrszág`) kitöltő poligonja. A réteg neve a fájlban: `Nagy-Magyarország (egyszerűsített)`. Egy gyűrű, 878 töréspont. A vonalat változtatás nélkül őriztük meg, hogy a régi országhatár továbbra is bekapcsolható legyen.
+A korábbi uMap-export két, koordinátára azonos fájl volt, mindkettő neve `Nagy-Magyarország (egyszerűsített)`, 878 töréspont, zárt gyűrű:
 
-Ez a körvonal durvább, mint a vármegyék külső éle. Nagyobb eltérés van Vas vármegye nyugati határán, a Kárpátok gerincén (Árva, Szepes, Csík, Háromszék) és az Adriai-tenger partján. A vármegyéket nem vágtuk hozzá ehhez a vonalhoz, mert a népszámlálási területekhez a részletes határ illeszkedik.
+- vonal (`LineString`) – a körvonalréteg
+- felület (`Polygon`) – a kitöltő réteg
+
+Ezt a 878 pontos, egyszerűsített vonalat a vármegyék uniójának külső pereme váltotta fel. Minden új töréspont rajta van valamelyik 1910-es megyehatáron. A néhány négyzetkilométeres, megyék közé szorult rést (csatlakozási hézag, nem valódi enklávé) a körvonal kitölti, hogy a vonal egyetlen folyamatos perem legyen.
+
+| Változat | Név a fájlban | Geometria | Töréspont |
+| --- | --- | --- | --- |
+| Teljes királyság, vonal | Nagy-Magyarország (1910) | LineString | 3310 |
+| Teljes királyság, felület | Nagy-Magyarország (1910) | Polygon | 3310 |
+| Magyarország és Fiume, vonal | Magyarország és Fiume (1910) | MultiLineString (2 rész) | 2830 + 29 |
+| Magyarország és Fiume, felület | Magyarország és Fiume (1910) | MultiPolygon (2 rész) | 2830 + 29 |
+
+A két rész Magyarország és a tőle Horvát-Szlavónország által elválasztott Fiume. A fájlok szerkezete a régi exporté: egy `FeatureCollection`, egy elem, egyedüli tulajdonság a `name`, szóköz nélküli JSON. Ezek tölthetők vissza uMapba. A térkép a teljes királyság felületét használja, kitöltés nélkül, piros vonallal.
 
 ## Vármegyehatárok
 

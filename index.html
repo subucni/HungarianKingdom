@@ -112,6 +112,7 @@
             text-shadow: 0 0 2px #fff, 0 0 4px #fff, 0 0 1px #fff;
         }
         .leaflet-tooltip.county-label::before { display: none; }
+        .kingdom-outline { pointer-events: none; }
         .map-status {
             position: absolute;
             z-index: 500;
@@ -146,9 +147,8 @@
                     Horvát-Szlavónország 8 vármegyéjét.
                 </p>
                 <p>
-                    A piros vonal a korábbi, egyszerűsített országhatár. A vármegyehatárok
-                    részletes történeti térképekről származnak, ezért a külső határon
-                    helyenként túlnyúlnak ezen a körvonalon.
+                    A piros vonal a vármegyék külső pereme: Magyarország, Fiume és
+                    Horvát-Szlavónország 1910-es határa. A megyehatárokkal egybeesik.
                 </p>
             </div>
 
@@ -282,7 +282,7 @@
             box.addEventListener("change", function () {
                 if (box.checked) layer.addTo(map);
                 else map.removeLayer(layer);
-                if (kingdomLayer && map.hasLayer(kingdomLayer)) kingdomLayer.bringToBack();
+                if (kingdomLayer && map.hasLayer(kingdomLayer)) kingdomLayer.bringToFront();
                 refreshLabels();
             });
         }
@@ -294,12 +294,15 @@
             fetch("data/varmegyek-horvat-szlavon-1910.geojson").then(function (r) { if (!r.ok) throw new Error("horvát-szlavón vármegyék"); return r.json(); })
         ]).then(function (files) {
             kingdomLayer = L.geoJSON(files[0], {
-                style: { color: "#9b2335", weight: 2.4, opacity: 0.95, fillColor: "#9b2335", fillOpacity: 0.08, dashArray: null },
-                onEachFeature: function (feature, layer) {
-                    const note = feature.properties.megjegyzes || "";
-                    layer.bindPopup("<strong>" + feature.properties.name + "</strong><br>" + note);
+                style: {
+                    className: "kingdom-outline",
+                    color: "#9b2335",
+                    weight: 3,
+                    opacity: 1,
+                    fill: false,
+                    interactive: false
                 }
-            }).addTo(map);
+            });
 
             hrLayer = L.geoJSON(files[2], {
                 style: function (feature) { return baseStyle(feature, COOL); },
@@ -311,7 +314,8 @@
                 onEachFeature: function (feature, layer) { bindCounty(layer, WARM); }
             }).addTo(map);
 
-            kingdomLayer.bringToBack();
+            kingdomLayer.addTo(map);
+            kingdomLayer.bringToFront();
             wireToggle("layer-kingdom", kingdomLayer);
             wireToggle("layer-hu", huLayer);
             wireToggle("layer-hr", hrLayer);

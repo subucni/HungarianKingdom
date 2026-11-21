@@ -1,10 +1,14 @@
 # Nagy Magyarország – vármegyék, 1910
 
-Interaktív OpenStreetMap-térkép a Magyar Királyság 1910-es vármegyéiről. A korábbi egyszerűsített országhatár megmaradt, mellé került a szűkebb Magyarország 63 vármegyéje és Fiume, valamint külön kikapcsolható rétegen Horvát-Szlavónország 8 vármegyéje.
+Interaktív OpenStreetMap-térkép a Magyar Királyság 1910-es vármegyéiről. A piros országhatár a vármegyék külső pereme. A szűkebb Magyarország 63 vármegyéje és Fiume egy réteg, Horvát-Szlavónország 8 vármegyéje külön kikapcsolható.
 
 A térkép a `index.html` fájl. A geometria a `data/` mappában van:
 
-- `data/magyar-kiralysag-hatar.geojson` – az eredeti, egyszerűsített királysághatár
+- `data/magyar-kiralysag-hatar.geojson` – a térképen rajzolt királysághatár (poligon, Horvát-Szlavónországgal együtt)
+- `data/nagy-magyarorszag-1910-vonal.geojson` – ugyanaz vonalként, uMap-ba visszatölthető
+- `data/nagy-magyarorszag-1910-terulet.geojson` – ugyanaz felületként, uMap-ba visszatölthető
+- `data/magyarorszag-es-fiume-1910-vonal.geojson` – csak Magyarország és Fiume, vonal
+- `data/magyarorszag-es-fiume-1910-terulet.geojson` – csak Magyarország és Fiume, felület
 - `data/varmegyek-magyarorszag-1910.geojson` – 63 vármegye + Fiume város és területe
 - `data/varmegyek-horvat-szlavon-1910.geojson` – Horvát-Szlavónország 8 vármegyéje
 
