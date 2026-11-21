@@ -3,13 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nagy Magyarország – Magyar Királyság történelmi határai</title>
-    <meta name="description" content="Nagy Magyarország és a Magyar Királyság történelmi határai interaktív térképen. Trianon előtti Magyarország, Felvidék, Erdély, Vajdaság, Kárpátalja.">
-    <meta name="keywords" content="Nagy Magyarország, Magyar Királyság, történelmi határok, Trianon, Felvidék, Erdély, Vajdaság, Kárpátalja, interaktív térkép">
+    <title>Nagy Magyarország – vármegyék, 1910</title>
+    <meta name="description" content="A Magyar Királyság 1910-es vármegyéi és a történelmi országhatár interaktív OpenStreetMap térképen.">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
     <style>
-        * {
-            box-sizing: border-box;
-        }
+        * { box-sizing: border-box; }
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             margin: 0;
@@ -19,14 +17,11 @@
             height: 100vh;
             overflow: hidden;
         }
-        .layout {
-            display: flex;
-            height: 100vh;
-        }
+        .layout { display: flex; height: 100vh; }
         .sidebar {
             min-width: 280px;
             max-width: 400px;
-            width: 320px;
+            width: 340px;
             background: #1a1a2e;
             color: white;
             padding: 1.5rem;
@@ -38,19 +33,18 @@
             font-size: 1.5rem;
             line-height: 1.2;
         }
+        .sidebar h2 {
+            margin: 1.25rem 0 0.6rem 0;
+            font-size: 0.95rem;
+            letter-spacing: 0.02em;
+        }
         .sidebar .subtitle {
-            margin: 0 0 1.5rem 0;
+            margin: 0 0 1.25rem 0;
             opacity: 0.7;
             font-size: 0.9rem;
         }
-        .sidebar .info {
-            font-size: 0.9rem;
-            line-height: 1.6;
-            opacity: 0.9;
-        }
-        .sidebar .info p {
-            margin: 0 0 1rem 0;
-        }
+        .sidebar .info { font-size: 0.9rem; line-height: 1.6; opacity: 0.9; }
+        .sidebar .info p { margin: 0 0 1rem 0; }
         .sidebar .disclaimer {
             font-size: 0.8rem;
             opacity: 0.6;
@@ -59,36 +53,76 @@
             padding-top: 1rem;
             margin-top: 1rem;
         }
-        .sidebar a {
-            color: #7eb8ff;
+        .sidebar a { color: #7eb8ff; }
+        .layers { display: flex; flex-direction: column; gap: 0.45rem; }
+        .layers label {
+            display: flex;
+            gap: 0.55rem;
+            align-items: flex-start;
+            font-size: 0.92rem;
+            line-height: 1.35;
+            cursor: pointer;
         }
+        .layers input { margin-top: 0.2rem; }
+        .swatch {
+            display: inline-block;
+            width: 0.85rem;
+            height: 0.85rem;
+            margin-right: 0.15rem;
+            border-radius: 2px;
+            vertical-align: -1px;
+            border: 1px solid rgba(255,255,255,0.45);
+        }
+        .swatch.kingdom { background: transparent; border: 2px solid #e07a7a; }
+        .swatch.hu { background: #e7d3a8; border-color: #8a6a45; }
+        .swatch.hr { background: #c9dbe3; border-color: #3d6d86; }
+        .detail {
+            margin-top: 0.4rem;
+            background: rgba(255,255,255,0.06);
+            border-radius: 8px;
+            padding: 0.8rem 0.9rem;
+            font-size: 0.9rem;
+            line-height: 1.45;
+        }
+        .detail h2 { margin: 0 0 0.35rem 0; font-size: 1rem; }
+        .detail p { margin: 0.2rem 0; }
+        .detail .hint { opacity: 0.65; margin: 0; }
         .map-area {
             flex: 1;
             min-width: 400px;
             min-height: 400px;
             position: relative;
         }
-        .map-area iframe {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+        #map { position: absolute; inset: 0; background: #d9e2df; }
+        .leaflet-tooltip.county-label {
+            background: transparent;
             border: none;
+            box-shadow: none;
+            color: #241c16;
+            font-weight: 650;
+            font-size: 11px;
+            padding: 0;
+            pointer-events: none;
+            text-shadow: 0 0 2px #fff, 0 0 4px #fff, 0 0 1px #fff;
+        }
+        .leaflet-tooltip.county-label::before { display: none; }
+        .map-status {
+            position: absolute;
+            z-index: 500;
+            left: 12px;
+            bottom: 28px;
+            background: rgba(26,26,46,0.88);
+            color: white;
+            padding: 0.45rem 0.7rem;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            display: none;
         }
         @media (max-width: 700px) {
-            .layout {
-                flex-direction: column;
-            }
-            .sidebar {
-                width: 100%;
-                max-width: none;
-                max-height: 40vh;
-            }
-            .map-area {
-                min-height: 60vh;
-                flex: 1;
-            }
+            body { overflow: auto; height: auto; }
+            .layout { flex-direction: column; height: auto; min-height: 100vh; }
+            .sidebar { width: 100%; max-width: none; max-height: none; }
+            .map-area { min-height: 70vh; height: 70vh; flex: none; }
         }
     </style>
 </head>
@@ -96,36 +130,196 @@
     <div class="layout">
         <aside class="sidebar">
             <h1>Nagy Magyarország</h1>
-            <p class="subtitle">A Magyar Királyság történelmi határai</p>
-            
+            <p class="subtitle">A Magyar Királyság vármegyéi, 1910</p>
+
             <div class="info">
                 <p>
-                    Ez az interaktív térkép a <strong>Magyar Királyság</strong> (Nagy Magyarország) 
-                    történelmi határait mutatja be a trianoni békeszerződés előtti állapot szerint.
+                    A térkép a <strong>Magyar Királyság</strong> 1910. december 31-i,
+                    népszámláláskori vármegyéit mutatja: a szűkebb Magyarország
+                    63 vármegyéjét és Fiume városát, valamint külön rétegen
+                    Horvát-Szlavónország 8 vármegyéjét.
                 </p>
                 <p>
-                    A térképen látható területek: a mai Magyarország, <strong>Felvidék</strong> (Szlovákia), 
-                    <strong>Kárpátalja</strong>, <strong>Erdély</strong>, a <strong>Vajdaság</strong>, 
-                    valamint a történelmi horvát és ausztriai részek.
-                </p>
-                <p>
-                    <a href="https://umap.openstreetmap.fr/hu/map/nagy-magyarorszag_1480493" target="_blank">
-                        Teljes képernyős nézet
-                    </a>
-                </p>
-                <p class="disclaimer">
-                    A térkép tájékoztató jellegű, nem minősül hivatalos vagy hiteles forrásnak. 
-                    A határvonalak közelítő ábrázolások, és eltérhetnek a történelmi dokumentumoktól.
+                    A piros vonal a korábbi, egyszerűsített országhatár. A vármegyehatárok
+                    részletes történeti térképekről származnak, ezért a külső határon
+                    helyenként túlnyúlnak ezen a körvonalon.
                 </p>
             </div>
+
+            <h2>Rétegek</h2>
+            <div class="layers">
+                <label>
+                    <input type="checkbox" id="layer-kingdom" checked>
+                    <span><span class="swatch kingdom"></span>Magyar Királyság határa</span>
+                </label>
+                <label>
+                    <input type="checkbox" id="layer-hu" checked>
+                    <span><span class="swatch hu"></span>Magyarország vármegyéi és Fiume (64)</span>
+                </label>
+                <label>
+                    <input type="checkbox" id="layer-hr" checked>
+                    <span><span class="swatch hr"></span>Horvát-Szlavónország vármegyéi (8)</span>
+                </label>
+            </div>
+
+            <h2>Kijelölés</h2>
+            <div class="detail" id="detail">
+                <p class="hint">Vigye az egeret egy vármegyére, vagy kattintson rá.</p>
+            </div>
+
+            <p class="disclaimer">
+                Vármegyehatárok: <a href="https://www.openhistoricalmap.org/copyright">OpenHistoricalMap</a>
+                (CC0, ahol a vonalon nincs más licenc).
+                A mai szlovén határ egyes szakaszai: Surveying and Mapping Authority of the Republic of Slovenia,
+                <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>.
+                Alaptérkép © <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> közreműködők.
+                Részletes forrás és licenc: <a href="SOURCES.md">SOURCES.md</a>.
+                A térkép tájékoztató, nem hivatalos közigazgatási nyilvántartás.
+            </p>
         </aside>
 
         <main class="map-area">
-            <iframe 
-                src="https://umap.openstreetmap.fr/hu/map/nagy-magyarorszag_1480493?scaleControl=false&miniMap=false&scrollWheelZoom=true&zoomControl=true&editMode=disabled&moreControl=true&datalayersControl=true&onLoadPanel=none&captionBar=false"
-                allowfullscreen>
-            </iframe>
+            <div id="map" role="application" aria-label="A Magyar Királyság 1910-es vármegyéi"></div>
+            <div class="map-status" id="map-status">A vármegyék betöltése…</div>
         </main>
     </div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <script>
+        const WARM = ["#e7d3a8", "#f0dcc0", "#e4cbb3", "#efe0c4", "#dccfb4", "#f3e2c8", "#e8d5b5", "#f1d8c4", "#ead7be", "#e5d4c4"];
+        const COOL = ["#c9dbe3", "#d5e2d4", "#ddd8c8", "#cfe0e4", "#e4e0d0", "#d4ddd6", "#dce3dc", "#e6e1d2"];
+
+        const map = L.map("map", { zoomControl: true, minZoom: 5 });
+        window.map = map;
+        L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
+            maxZoom: 18,
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> közreműködők'
+        }).addTo(map);
+        map.setView([47.0, 20.5], 6);
+
+        const statusEl = document.getElementById("map-status");
+        const detailEl = document.getElementById("detail");
+        const labelLayer = L.layerGroup().addTo(map);
+
+        function colorFor(name, palette) {
+            let hash = 0;
+            for (let i = 0; i < name.length; i++) hash = (hash * 33 + name.charCodeAt(i)) >>> 0;
+            return palette[hash % palette.length];
+        }
+
+        function shortName(name) {
+            if (name.indexOf("Fiume") === 0) return "Fiume";
+            return name.replace(/ vármegye$/, "");
+        }
+
+        function detailHtml(props) {
+            const countries = (props.orszagok || []).join(", ");
+            const kind = props.tipus === "corpus separatum" ? "Corpus separatum" : "Vármegye";
+            return "<h2>" + props.name + "</h2>"
+                + "<p>" + kind + "</p>"
+                + "<p><strong>Székhely:</strong> " + props.szekhely + "</p>"
+                + "<p><strong>Mai országok:</strong> " + countries + "</p>";
+        }
+
+        function showDetail(props) {
+            detailEl.innerHTML = detailHtml(props);
+        }
+
+        function baseStyle(feature, palette) {
+            return {
+                color: "#4a3728",
+                weight: 1,
+                opacity: 0.9,
+                fillColor: colorFor(feature.properties.name, palette),
+                fillOpacity: 0.55
+            };
+        }
+
+        function bindCounty(layer, palette) {
+            const props = layer.feature.properties;
+            layer.bindTooltip(props.name, { sticky: true, opacity: 0.95 });
+            layer.bindPopup(detailHtml(props));
+            layer.on("mouseover", function (event) {
+                event.target.setStyle({ weight: 2.4, color: "#1a1a2e", fillOpacity: 0.78 });
+                showDetail(props);
+            });
+            layer.on("mouseout", function (event) {
+                layer.resetStyle(event.target);
+            });
+            layer.on("click", function () { showDetail(props); });
+        }
+
+        let kingdomLayer;
+        let huLayer;
+        let hrLayer;
+
+        function refreshLabels() {
+            labelLayer.clearLayers();
+            if (map.getZoom() < 8) return;
+            [huLayer, hrLayer].forEach(function (group) {
+                if (!group || !map.hasLayer(group)) return;
+                group.eachLayer(function (layer) {
+                    const props = layer.feature && layer.feature.properties;
+                    if (!props || !props.cimke) return;
+                    labelLayer.addLayer(L.tooltip({
+                        permanent: true,
+                        direction: "center",
+                        className: "county-label",
+                        opacity: 1
+                    }).setLatLng([props.cimke[1], props.cimke[0]]).setContent(shortName(props.name)));
+                });
+            });
+        }
+
+        function wireToggle(id, layer) {
+            const box = document.getElementById(id);
+            box.addEventListener("change", function () {
+                if (box.checked) layer.addTo(map);
+                else map.removeLayer(layer);
+                if (kingdomLayer && map.hasLayer(kingdomLayer)) kingdomLayer.bringToBack();
+                refreshLabels();
+            });
+        }
+
+        statusEl.style.display = "block";
+        Promise.all([
+            fetch("data/magyar-kiralysag-hatar.geojson").then(function (r) { if (!r.ok) throw new Error("határ"); return r.json(); }),
+            fetch("data/varmegyek-magyarorszag-1910.geojson").then(function (r) { if (!r.ok) throw new Error("magyar vármegyék"); return r.json(); }),
+            fetch("data/varmegyek-horvat-szlavon-1910.geojson").then(function (r) { if (!r.ok) throw new Error("horvát-szlavón vármegyék"); return r.json(); })
+        ]).then(function (files) {
+            kingdomLayer = L.geoJSON(files[0], {
+                style: { color: "#9b2335", weight: 2.4, opacity: 0.95, fillColor: "#9b2335", fillOpacity: 0.08, dashArray: null },
+                onEachFeature: function (feature, layer) {
+                    const note = feature.properties.megjegyzes || "";
+                    layer.bindPopup("<strong>" + feature.properties.name + "</strong><br>" + note);
+                }
+            }).addTo(map);
+
+            hrLayer = L.geoJSON(files[2], {
+                style: function (feature) { return baseStyle(feature, COOL); },
+                onEachFeature: function (feature, layer) { bindCounty(layer, COOL); }
+            }).addTo(map);
+
+            huLayer = L.geoJSON(files[1], {
+                style: function (feature) { return baseStyle(feature, WARM); },
+                onEachFeature: function (feature, layer) { bindCounty(layer, WARM); }
+            }).addTo(map);
+
+            kingdomLayer.bringToBack();
+            wireToggle("layer-kingdom", kingdomLayer);
+            wireToggle("layer-hu", huLayer);
+            wireToggle("layer-hr", hrLayer);
+
+            const bounds = L.featureGroup([kingdomLayer, huLayer, hrLayer]).getBounds();
+            map.fitBounds(bounds, { padding: [16, 16] });
+            map.on("zoomend", refreshLabels);
+            refreshLabels();
+            statusEl.style.display = "none";
+        }).catch(function (error) {
+            statusEl.textContent = "A térképadatok nem töltődtek be (" + error.message + ").";
+        });
+
+        window.addEventListener("resize", function () { map.invalidateSize(); });
+    </script>
 </body>
 </html>
