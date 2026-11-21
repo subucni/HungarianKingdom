@@ -11,6 +11,8 @@ A vármegyehatárok 1910. december 31-i, a népszámlálás napján érvényes k
 | `data/nagy-magyarorszag-1910-terulet.geojson` | Ugyanez a határ felületként (Polygon), a korábbi uMap-felület formátumában. |
 | `data/magyarorszag-es-fiume-1910-vonal.geojson` | Csak a szűkebb Magyarország és Fiume külső pereme (MultiLineString: az ország és a fiumei exclávé). |
 | `data/magyarorszag-es-fiume-1910-terulet.geojson` | Ugyanez felületként (MultiPolygon). |
+| `data/magyarorszag-mai-hatar-vonal.geojson` | A mai Magyarország határa vonalként (LineString). |
+| `data/magyarorszag-mai-hatar-terulet.geojson` | Ugyanez felületként (Polygon); ezt rajzolja a térkép. |
 | `data/varmegyek-magyarorszag-1910.geojson` | A szűkebb Magyarország 63 vármegyéje és Fiume város és területe (64 elem). |
 | `data/varmegyek-horvat-szlavon-1910.geojson` | Horvát-Szlavónország 8 vármegyéje. |
 
@@ -40,6 +42,12 @@ Ezt a 878 pontos, egyszerűsített vonalat a vármegyék uniójának külső per
 | Magyarország és Fiume, felület | Magyarország és Fiume (1910) | MultiPolygon (2 rész) | 2830 + 29 |
 
 A két rész Magyarország és a tőle Horvát-Szlavónország által elválasztott Fiume. A fájlok szerkezete a régi exporté: egy `FeatureCollection`, egy elem, egyedüli tulajdonság a `name`, szóköz nélküli JSON. Ezek tölthetők vissza uMapba. A térkép a teljes királyság felületét használja, kitöltés nélkül, piros vonallal.
+
+## Mai magyar határ
+
+Forrás: OpenStreetMap Magyarország-viszony (`relation/21335`, adminisztratív országhatár), letöltve 2026. november 21-én a Nominatim polygon-végpontjáról. Licenc: [ODbL 1.0](https://opendatacommons.org/licenses/odbl/1-0/), © OpenStreetMap közreműködők. A nyers vonal 37 754 pont volt; Douglas–Peucker egyszerűsítés 0,002 fokos tűréssel 1689 pontra csökkentette. A felület területe az egyszerűsítés után 93 011 km², a részletes poligoné 93 012 km².
+
+A fájlban a név: `Magyarország (mai határ)`. A térkép kék vonallal (`#1d4ed8`) rajzolja, a piros királysághatár és a vármegyefelületek fölött.
 
 ## Vármegyehatárok
 

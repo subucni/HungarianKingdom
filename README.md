@@ -9,6 +9,8 @@ A térkép a `index.html` fájl. A geometria a `data/` mappában van:
 - `data/nagy-magyarorszag-1910-terulet.geojson` – ugyanaz felületként, uMap-ba visszatölthető
 - `data/magyarorszag-es-fiume-1910-vonal.geojson` – csak Magyarország és Fiume, vonal
 - `data/magyarorszag-es-fiume-1910-terulet.geojson` – csak Magyarország és Fiume, felület
+- `data/magyarorszag-mai-hatar-vonal.geojson` – a mai Magyarország határa, vonal (OpenStreetMap, ODbL)
+- `data/magyarorszag-mai-hatar-terulet.geojson` – a mai Magyarország határa, felület
 - `data/varmegyek-magyarorszag-1910.geojson` – 63 vármegye + Fiume város és területe
 - `data/varmegyek-horvat-szlavon-1910.geojson` – Horvát-Szlavónország 8 vármegyéje
 

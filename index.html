@@ -112,7 +112,8 @@
             text-shadow: 0 0 2px #fff, 0 0 4px #fff, 0 0 1px #fff;
         }
         .leaflet-tooltip.county-label::before { display: none; }
-        .kingdom-outline { pointer-events: none; }
+        .kingdom-outline, .modern-outline { pointer-events: none; }
+        .swatch.modern { background: transparent; border: 2px solid #1d4ed8; }
         .map-status {
             position: absolute;
             z-index: 500;
@@ -148,7 +149,8 @@
                 </p>
                 <p>
                     A piros vonal a vármegyék külső pereme: Magyarország, Fiume és
-                    Horvát-Szlavónország 1910-es határa. A megyehatárokkal egybeesik.
+                    Horvát-Szlavónország 1910-es határa. A kék vonal a mai Magyarország
+                    határa.
                 </p>
             </div>
 
@@ -157,6 +159,10 @@
                 <label>
                     <input type="checkbox" id="layer-kingdom" checked>
                     <span><span class="swatch kingdom"></span>Magyar Királyság határa</span>
+                </label>
+                <label>
+                    <input type="checkbox" id="layer-modern" checked>
+                    <span><span class="swatch modern"></span>Magyarország mai határa</span>
                 </label>
                 <label>
                     <input type="checkbox" id="layer-hu" checked>
@@ -178,7 +184,7 @@
                 (CC0, ahol a vonalon nincs más licenc).
                 A mai szlovén határ egyes szakaszai: Surveying and Mapping Authority of the Republic of Slovenia,
                 <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>.
-                Alaptérkép © <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> közreműködők.
+                Mai magyar határ és alaptérkép © <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> közreműködők, ODbL.
                 Részletes forrás és licenc: <a href="SOURCES.md">SOURCES.md</a>.
                 A térkép tájékoztató, nem hivatalos közigazgatási nyilvántartás.
             </p>
@@ -256,8 +262,14 @@
         }
 
         let kingdomLayer;
+        let modernLayer;
         let huLayer;
         let hrLayer;
+
+        function raiseOutlines() {
+            if (modernLayer && map.hasLayer(modernLayer)) modernLayer.bringToFront();
+            if (kingdomLayer && map.hasLayer(kingdomLayer)) kingdomLayer.bringToFront();
+        }
 
         function refreshLabels() {
             labelLayer.clearLayers();
@@ -282,7 +294,7 @@
             box.addEventListener("change", function () {
                 if (box.checked) layer.addTo(map);
                 else map.removeLayer(layer);
-                if (kingdomLayer && map.hasLayer(kingdomLayer)) kingdomLayer.bringToFront();
+                raiseOutlines();
                 refreshLabels();
             });
         }
@@ -291,7 +303,8 @@
         Promise.all([
             fetch("data/magyar-kiralysag-hatar.geojson").then(function (r) { if (!r.ok) throw new Error("határ"); return r.json(); }),
             fetch("data/varmegyek-magyarorszag-1910.geojson").then(function (r) { if (!r.ok) throw new Error("magyar vármegyék"); return r.json(); }),
-            fetch("data/varmegyek-horvat-szlavon-1910.geojson").then(function (r) { if (!r.ok) throw new Error("horvát-szlavón vármegyék"); return r.json(); })
+            fetch("data/varmegyek-horvat-szlavon-1910.geojson").then(function (r) { if (!r.ok) throw new Error("horvát-szlavón vármegyék"); return r.json(); }),
+            fetch("data/magyarorszag-mai-hatar-terulet.geojson").then(function (r) { if (!r.ok) throw new Error("mai határ"); return r.json(); })
         ]).then(function (files) {
             kingdomLayer = L.geoJSON(files[0], {
                 style: {
@@ -314,13 +327,25 @@
                 onEachFeature: function (feature, layer) { bindCounty(layer, WARM); }
             }).addTo(map);
 
+            modernLayer = L.geoJSON(files[3], {
+                style: {
+                    className: "modern-outline",
+                    color: "#1d4ed8",
+                    weight: 2.75,
+                    opacity: 1,
+                    fill: false,
+                    interactive: false
+                }
+            }).addTo(map);
+
             kingdomLayer.addTo(map);
-            kingdomLayer.bringToFront();
+            raiseOutlines();
             wireToggle("layer-kingdom", kingdomLayer);
+            wireToggle("layer-modern", modernLayer);
             wireToggle("layer-hu", huLayer);
             wireToggle("layer-hr", hrLayer);
 
-            const bounds = L.featureGroup([kingdomLayer, huLayer, hrLayer]).getBounds();
+            const bounds = L.featureGroup([kingdomLayer, modernLayer, huLayer, hrLayer]).getBounds();
             map.fitBounds(bounds, { padding: [16, 16] });
             map.on("zoomend", refreshLabels);
             refreshLabels();
