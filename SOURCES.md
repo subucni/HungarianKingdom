@@ -14,6 +14,8 @@ A vármegyehatárok 1910. december 31-i, a népszámlálás napján érvényes k
 | `data/magyarorszag-mai-hatar-vonal.geojson` | A mai Magyarország határa vonalként (LineString). |
 | `data/magyarorszag-mai-hatar-terulet.geojson` | Ugyanez felületként (Polygon); ezt rajzolja a térkép. |
 | `data/varmegyek-ma.geojson` | A mai 19 vármegye és Budapest (20 felület). |
+| `data/oszver.geojson` | Öszvér réteg: mai vármegyék a mai határon belül, 1910-es maradék azon kívül. |
+| `data/oszver-vonal.geojson` | Ugyanezek külső vonala. |
 | `data/varmegyek-ma-vonal.geojson` | Ugyanezek külső vonala, vármegyénként. |
 | `data/varmegyek-magyarorszag-1910.geojson` | A szűkebb Magyarország 63 vármegyéje és Fiume város és területe (64 elem). |
 | `data/varmegyek-horvat-szlavon-1910.geojson` | Horvát-Szlavónország 8 vármegyéje. |
@@ -58,6 +60,14 @@ Forrás: OpenStreetMap, a hét statisztikai régió (`admin_level=5`) alatti 20 
 A közös megyehatárokat egyszer, 0,002 fokos tűréssel egyszerűsítettük, hogy a szomszédok éle azonos maradjon. A külső peremet a már egyszerűsített mai országhatárra illesztettük: a vármegyék uniója és a `magyarorszag-mai-hatar` felület eltérése 0,001 km² alatt van. Az OSM névcímkéje még „megye”; a fájlban a 2023 óta hivatalos „vármegye” alak szerepel, Budapest külön főváros. A székhely az OSM `admin_centre` csomópontja. Pest vármegye székhelye Budapest, a székhely pontja ezért a főváros felületén van, nem a megyéében.
 
 A térkép lila vonallal (`#6d28d9`) rajzolja, halvány lilás kitöltéssel, hogy a határ összevethető legyen az 1910-es vármegyékkel. Tulajdonságok: `name`, `szekhely`, valamint `tipus` (`vármegye` vagy `főváros`) és `cimke`. A vonalas fájlban csak `name` és `szekhely` van.
+
+## Öszvér réteg
+
+A mai országhatáron belül a `varmegyek-ma.geojson` 20 eleme szerepel (`tipus`: `mai`). Azon kívül, a királyság 1910-es külső határáig, az 1910-es vármegyéknek a mai Magyarországból kivont része (`tipus`: `1910-maradek`). A Horvát-Szlavónországból származó maradékok `orszagcsoport` értéke `horvat-szlavonorszag`, a magyarországiaké `magyarorszag`. A maradékok megtartják az `orszagok` mezőt.
+
+A határvonalak egyszerűsítése miatt a mai határ mentén vékony szilánkok keletkeztek. Ezeket nem önálló elemekként tartottuk meg: ami 1 km²-nél kisebb és nem tömör folt (a kivétel egy legalább 0,4 km²-es, legalább 0,8 km széles, kitöltöttségében legalább 0,3-as darab), azt a vele határos megmaradt vármegyéhez olvasztottuk. Összesen 162 ilyen szilánk volt, 11,8 km². Így a réteg hézagmentesen és átfedés nélkül fedi a királyság felületét.
+
+A térképen a mai rész lila (`#6d28d9`), az 1910-es magyarországi maradék borostyán (`#9a3412`), a horvát-szlavón maradék zöldeskék (`#0f766e`). A réteg alapból ki van kapcsolva.
 
 ## Vármegyehatárok
 

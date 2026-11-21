@@ -113,9 +113,12 @@
         }
         .leaflet-tooltip.county-label::before { display: none; }
         .leaflet-tooltip.county-label.modern-label { color: #5b21b6; }
+        .leaflet-tooltip.county-label.remnant-label { color: #9a3412; }
+        .leaflet-tooltip.county-label.hr-label { color: #0f766e; }
         .kingdom-outline, .modern-outline { pointer-events: none; }
         .swatch.modern { background: transparent; border: 2px solid #1d4ed8; }
         .swatch.today { background: transparent; border: 2px solid #6d28d9; }
+        .swatch.oszver { background: linear-gradient(90deg, #ddd6fe 50%, #f3e6c8 50%); border-color: #6d28d9; }
         .map-status {
             position: absolute;
             z-index: 500;
@@ -152,7 +155,8 @@
                 <p>
                     A piros vonal a vármegyék külső pereme: Magyarország, Fiume és
                     Horvát-Szlavónország 1910-es határa. A kék vonal a mai országhatár,
-                    a lila a mai 19 vármegye és Budapest.
+                    a lila a mai 19 vármegye és Budapest. Az öszvér réteg a mai megyéket
+                    a mai országhatáron belül, az 1910-es megyék megmaradt részét azon kívül mutatja.
                 </p>
             </div>
 
@@ -177,6 +181,10 @@
                 <label>
                     <input type="checkbox" id="layer-hr" checked>
                     <span><span class="swatch hr"></span>Horvát-Szlavónország vármegyéi (8)</span>
+                </label>
+                <label>
+                    <input type="checkbox" id="layer-oszver">
+                    <span><span class="swatch oszver"></span>Öszvér: mai + elcsatolt részek</span>
                 </label>
             </div>
 
@@ -231,9 +239,15 @@
         }
 
         function detailHtml(props) {
-            const kind = props.tipus === "corpus separatum" ? "Corpus separatum"
-                : props.tipus === "főváros" ? "Főváros"
-                : "Vármegye";
+            let kind = "Vármegye";
+            if (props.tipus === "corpus separatum") kind = "Corpus separatum";
+            else if (props.tipus === "főváros") kind = "Főváros";
+            else if (props.tipus === "mai") kind = props.name === "Budapest" ? "Mai főváros" : "Mai vármegye";
+            else if (props.tipus === "1910-maradek") {
+                kind = props.orszagcsoport === "horvat-szlavonorszag"
+                    ? "1910-es maradék, Horvát-Szlavónország"
+                    : "1910-es maradék";
+            }
             let html = "<h2>" + props.name + "</h2><p>" + kind + "</p>";
             if (props.szekhely) html += "<p><strong>Székhely:</strong> " + props.szekhely + "</p>";
             if (props.orszagok && props.orszagok.length) {
@@ -276,18 +290,37 @@
         let huLayer;
         let hrLayer;
 
+        let oszverLayer;
+
         function raiseOutlines() {
+            if (oszverLayer && map.hasLayer(oszverLayer)) oszverLayer.bringToFront();
             if (todayLayer && map.hasLayer(todayLayer)) todayLayer.bringToFront();
             if (modernLayer && map.hasLayer(modernLayer)) modernLayer.bringToFront();
             if (kingdomLayer && map.hasLayer(kingdomLayer)) kingdomLayer.bringToFront();
         }
 
+        function oszverStyle(feature) {
+            const props = feature.properties;
+            if (props.tipus === "mai") {
+                return { color: "#6d28d9", weight: 1.3, fillColor: "#ddd6fe", fillOpacity: 0.82 };
+            }
+            if (props.orszagcsoport === "horvat-szlavonorszag") {
+                return { color: "#0f766e", weight: 1.3, fillColor: "#8fd0c8", fillOpacity: 0.9 };
+            }
+            return { color: "#9a3412", weight: 1.15, fillColor: colorFor(props.name, WARM), fillOpacity: 0.84 };
+        }
+
+        function labelClass(props) {
+            if (props.tipus === "mai" || props.tipus === "főváros") return "county-label modern-label";
+            if (props.tipus === "1910-maradek" && props.orszagcsoport === "horvat-szlavonorszag") return "county-label hr-label";
+            if (props.tipus === "1910-maradek") return "county-label remnant-label";
+            return "county-label";
+        }
+
         function refreshLabels() {
             labelLayer.clearLayers();
             if (map.getZoom() < 8) return;
-            [[huLayer, "county-label"], [hrLayer, "county-label"], [todayLayer, "county-label modern-label"]].forEach(function (pair) {
-                const group = pair[0];
-                const cls = pair[1];
+            [huLayer, hrLayer, todayLayer, oszverLayer].forEach(function (group) {
                 if (!group || !map.hasLayer(group)) return;
                 group.eachLayer(function (layer) {
                     const props = layer.feature && layer.feature.properties;
@@ -295,7 +328,7 @@
                     labelLayer.addLayer(L.tooltip({
                         permanent: true,
                         direction: "center",
-                        className: cls,
+                        className: labelClass(props),
                         opacity: 1
                     }).setLatLng([props.cimke[1], props.cimke[0]]).setContent(shortName(props.name)));
                 });
@@ -318,7 +351,8 @@
             fetch("data/varmegyek-magyarorszag-1910.geojson").then(function (r) { if (!r.ok) throw new Error("magyar vármegyék"); return r.json(); }),
             fetch("data/varmegyek-horvat-szlavon-1910.geojson").then(function (r) { if (!r.ok) throw new Error("horvát-szlavón vármegyék"); return r.json(); }),
             fetch("data/magyarorszag-mai-hatar-terulet.geojson").then(function (r) { if (!r.ok) throw new Error("mai határ"); return r.json(); }),
-            fetch("data/varmegyek-ma.geojson").then(function (r) { if (!r.ok) throw new Error("mai vármegyék"); return r.json(); })
+            fetch("data/varmegyek-ma.geojson").then(function (r) { if (!r.ok) throw new Error("mai vármegyék"); return r.json(); }),
+            fetch("data/oszver.geojson").then(function (r) { if (!r.ok) throw new Error("öszvér"); return r.json(); })
         ]).then(function (files) {
             kingdomLayer = L.geoJSON(files[0], {
                 style: {
@@ -363,6 +397,11 @@
                 }
             }).addTo(map);
 
+            oszverLayer = L.geoJSON(files[5], {
+                style: oszverStyle,
+                onEachFeature: function (feature, layer) { bindCounty(layer); }
+            });
+
             kingdomLayer.addTo(map);
             raiseOutlines();
             wireToggle("layer-kingdom", kingdomLayer);
@@ -370,6 +409,7 @@
             wireToggle("layer-today", todayLayer);
             wireToggle("layer-hu", huLayer);
             wireToggle("layer-hr", hrLayer);
+            wireToggle("layer-oszver", oszverLayer);
 
             const bounds = L.featureGroup([kingdomLayer, modernLayer, huLayer, hrLayer]).getBounds();
             map.fitBounds(bounds, { padding: [16, 16] });
